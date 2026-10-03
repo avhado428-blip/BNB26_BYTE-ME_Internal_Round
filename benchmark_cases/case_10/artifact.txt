@@ -1,0 +1,3 @@
+﻿TrustLayer synthetic artifact for case_10
+claim: Bodycam frame chain intact
+expected: AUTHENTIC

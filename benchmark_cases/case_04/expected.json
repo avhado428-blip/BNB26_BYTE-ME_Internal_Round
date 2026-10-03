@@ -1,0 +1,20 @@
+{
+  "case_id": "case_04",
+  "expected_verdict": "CONTRADICTORY",
+  "has_contradiction": true,
+  "claim": "Nighttime protest",
+  "conflicting_signal": "Midday shadow geometry",
+  "demo_id": "demo_cross_modal_contradiction",
+  "summary": "Vision vs caption conflict",
+  "mock_confidence": 0.83,
+  "mock_authenticity_score": 0.45,
+  "context": "Nighttime protest",
+  "evidence": [
+    "synthetic_benchmark",
+    "case_04"
+  ],
+  "telemetry": {
+    "synthetic": true,
+    "case": "case_04"
+  }
+}

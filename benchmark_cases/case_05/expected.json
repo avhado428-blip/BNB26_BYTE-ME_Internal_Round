@@ -1,0 +1,19 @@
+{
+  "case_id": "case_05",
+  "expected_verdict": "INCONCLUSIVE",
+  "has_contradiction": false,
+  "claim": "Unclear repost",
+  "demo_id": "demo_inconclusive_noise",
+  "summary": "Heavy recompression",
+  "mock_confidence": 0.41,
+  "mock_authenticity_score": 0.52,
+  "context": "Unclear repost",
+  "evidence": [
+    "synthetic_benchmark",
+    "case_05"
+  ],
+  "telemetry": {
+    "synthetic": true,
+    "case": "case_05"
+  }
+}

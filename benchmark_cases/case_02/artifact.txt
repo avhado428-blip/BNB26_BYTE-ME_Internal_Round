@@ -1,0 +1,3 @@
+﻿TrustLayer synthetic artifact for case_02
+claim: Interview subject is real
+expected: MANIPULATED

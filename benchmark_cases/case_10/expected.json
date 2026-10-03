@@ -1,0 +1,18 @@
+{
+  "case_id": "case_10",
+  "expected_verdict": "AUTHENTIC",
+  "has_contradiction": false,
+  "claim": "Bodycam frame chain intact",
+  "summary": "Consistent device fingerprint",
+  "mock_confidence": 0.9,
+  "mock_authenticity_score": 0.93,
+  "context": "Bodycam frame chain intact",
+  "evidence": [
+    "synthetic_benchmark",
+    "case_10"
+  ],
+  "telemetry": {
+    "synthetic": true,
+    "case": "case_10"
+  }
+}

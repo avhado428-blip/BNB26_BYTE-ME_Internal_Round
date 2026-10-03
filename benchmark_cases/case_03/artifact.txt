@@ -1,0 +1,3 @@
+﻿TrustLayer synthetic artifact for case_03
+claim: Taken in Nairobi
+expected: MANIPULATED
