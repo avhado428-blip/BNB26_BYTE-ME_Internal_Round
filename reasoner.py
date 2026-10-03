@@ -431,6 +431,14 @@ PRIMARY INVESTIGATION METHODOLOGY:
 5. EXPLAINABLE EVIDENCE CHAIN:
    Provide an ordered, numbered step-by-step chain of reasoning from raw claim extraction -> pairwise contradiction testing -> telemetry reconciliation -> final verdict conclusion.
 
+6. SIGNAL TELEMETRY INTERPRETATION RULES & CAVEATS:
+   Teammate 1's CV & Audio signal extractor provides quantitative telemetry metrics. Adhere strictly to these forensic caveats:
+   - Error Level Analysis (ELA) Caution: ELA is naturally noisy on detailed, textured scenes and unreliable on uncompressed PNGs. Treat high ELA differences as supporting hints or localized anomaly cues, NOT as standalone proof of forgery.
+   - Audio Signal Heuristics: Spectral centroid variance, zero-crossing rates, and silence dropoff ratios are experimental heuristics. Correlate them with your own acoustic perception of the clip's room reverberation, impulse response, and speech cadence.
+   - Missing EXIF Metadata: Absence of EXIF tags is suspicious but NOT conclusive proof of manipulation; messaging apps (WhatsApp, Telegram, Signal) and screenshots strip metadata routinely.
+   - Unanalyzed Modalities: Video files and PDFs are not processed by Teammate 1's signal extractors; you must rely on your own frame-by-frame and typographic inspection.
+   - Prime Telemetry Anchors: Prioritize 'all_flags' and each file's 'exif.date_taken' / 'DateTimeOriginal'. The date taken is the primary smoking gun for context-swap disinformation (repurposing historical media for breaking news claims).
+
 Output must strictly conform to the provided JSON schema.
 """
 
@@ -525,12 +533,22 @@ class TrustLayerReasoner:
             prompt_contents: List[Any] = []
 
             # 1. Add Investigation Metadata Header & Teammate 1 Telemetry
+            all_flags = telemetry.get("all_flags", []) if isinstance(telemetry, dict) else []
             telemetry_json = json.dumps(telemetry, indent=2)
+            flags_summary = (
+                f"Flagged Anomalies (all_flags):\n" + "\n".join(f"  - {f}" for f in all_flags) + "\n"
+                if all_flags
+                else "Flagged Anomalies: None reported by signal extractors.\n"
+            )
             context_header = (
                 f"=== INVESTIGATION BUNDLE [{case_id}] ===\n"
                 f"Incident Context / Investigator Notes:\n{incident_notes or 'No incident notes provided.'}\n\n"
-                f"Teammate 1 Forensic Telemetry (Signal Pipeline Metrics):\n{telemetry_json}\n\n"
-                f"Please conduct cross-modal forensic triangulation on the following artifacts:\n"
+                f"=== FORENSIC SIGNAL TELEMETRY (Teammate 1 Extraction Pipeline) ===\n"
+                f"{flags_summary}\n"
+                f"Full Signal Measurements (ELA, EXIF, and Audio Spectral Metrics by Artifact):\n"
+                f"{telemetry_json}\n\n"
+                f"Please conduct cross-modal forensic triangulation across these measurements and the attached media files.\n"
+                f"Reference each artifact by its exact filename to ensure claims and telemetry align.\n"
             )
             prompt_contents.append(types.Part.from_text(text=context_header))
 
@@ -632,7 +650,7 @@ class TrustLayerReasoner:
             raw_text = response.text or "{}"
             verdict = InvestigationVerdict.model_validate_json(raw_text)
             verdict.case_id = case_id
-            if telemetry and not verdict.forensic_telemetry:
+            if telemetry:
                 verdict.forensic_telemetry = telemetry
 
             return verdict
@@ -790,15 +808,70 @@ class TrustLayerReasoner:
         filenames = [a["filename"].lower() for a in parsed_artifacts]
         notes = (incident_notes or "").lower()
 
-        # Check telemetry signals
-        ela = telemetry.get("ela_anomalies", {}) or telemetry.get("ela", {})
-        exif = telemetry.get("exif_metadata", {}) or telemetry.get("exif", {})
-        audio_spec = telemetry.get("audio_spectrogram", {}) or telemetry.get("audio", {})
+        # Check telemetry signals (supports both flat dict and Teammate 1 structured format)
+        artifacts_telemetry = telemetry.get("artifacts", {}) if isinstance(telemetry, dict) else {}
+        all_flags = [str(f).lower() for f in telemetry.get("all_flags", [])] if isinstance(telemetry, dict) else []
 
-        ela_max = ela.get("max_anomaly_score", 0.0)
-        software = exif.get("Software", "").lower()
-        exif_datetime = exif.get("DateTimeOriginal", "")
-        silence_dropoffs = audio_spec.get("unnatural_silence_dropoffs", False)
+        ela_scores: List[float] = []
+        softwares: List[str] = []
+        datetimes: List[str] = []
+        silence_flags = False
+
+        # 1. Match per-artifact telemetry using exact filenames
+        for a in parsed_artifacts:
+            fname = a["filename"]
+            art_meta = artifacts_telemetry.get(fname, {})
+            if not art_meta:
+                # Case-insensitive fallback
+                for k, v in artifacts_telemetry.items():
+                    if k.lower() == fname.lower():
+                        art_meta = v
+                        break
+
+            if art_meta:
+                art_ela = art_meta.get("ela") or art_meta.get("ela_anomalies") or {}
+                raw_score = float(art_ela.get("max_anomaly_score", 0.0))
+                norm_score = raw_score / 255.0 if raw_score > 1.0 else raw_score
+                ela_scores.append(norm_score)
+
+                art_exif = art_meta.get("exif") or art_meta.get("exif_metadata") or {}
+                sw = art_exif.get("Software") or art_exif.get("software") or ""
+                if sw:
+                    softwares.append(str(sw).lower())
+                dt = art_exif.get("DateTimeOriginal") or art_exif.get("date_taken") or ""
+                if dt:
+                    datetimes.append(str(dt))
+
+                art_audio = art_meta.get("audio") or art_meta.get("audio_spectrogram") or {}
+                if art_audio.get("unnatural_silence_dropoffs") or "digital_silence_gaps" in art_meta.get("flags", []):
+                    silence_flags = True
+
+        # 2. Check flat legacy telemetry keys if provided
+        flat_ela = telemetry.get("ela_anomalies", {}) or telemetry.get("ela", {}) if isinstance(telemetry, dict) else {}
+        if flat_ela:
+            raw_s = float(flat_ela.get("max_anomaly_score", 0.0))
+            ela_scores.append(raw_s / 255.0 if raw_s > 1.0 else raw_s)
+
+        flat_exif = telemetry.get("exif_metadata", {}) or telemetry.get("exif", {}) if isinstance(telemetry, dict) else {}
+        if flat_exif:
+            sw = flat_exif.get("Software") or flat_exif.get("software") or ""
+            if sw:
+                softwares.append(str(sw).lower())
+            dt = flat_exif.get("DateTimeOriginal") or flat_exif.get("date_taken") or ""
+            if dt:
+                datetimes.append(str(dt))
+
+        flat_audio = telemetry.get("audio_spectrogram", {}) or telemetry.get("audio", {}) if isinstance(telemetry, dict) else {}
+        if flat_audio.get("unnatural_silence_dropoffs"):
+            silence_flags = True
+
+        if any("digital_silence" in f for f in all_flags):
+            silence_flags = True
+
+        ela_max = max(ela_scores) if ela_scores else 0.0
+        software = " ".join(softwares)
+        exif_datetime = datetimes[0] if datetimes else ""
+        silence_dropoffs = silence_flags
 
         claims: List[ExtractedClaim] = []
         contradictions: List[ContradictionLink] = []
