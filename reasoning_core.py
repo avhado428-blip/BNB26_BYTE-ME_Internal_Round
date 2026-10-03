@@ -37,7 +37,21 @@ async def reason(
     if isinstance(telemetry, dict):
         telemetry_dict = telemetry
     elif isinstance(telemetry, list):
-        telemetry_dict = {"signals": telemetry}
+        telemetry_dict = {"signals": []}
+        for item in telemetry:
+            if not isinstance(item, dict):
+                continue
+            telemetry_dict["signals"].append(item)
+            for key in (
+                "ela_anomalies",
+                "ela",
+                "exif_metadata",
+                "exif",
+                "audio_spectrogram",
+                "audio",
+            ):
+                if key in item and item[key] is not None:
+                    telemetry_dict[key] = item[key]
 
     reasoner = TrustLayerReasoner()
     return await reasoner.analyze_investigation(
