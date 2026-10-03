@@ -1,0 +1,204 @@
+{
+  "artifacts": {
+    "34129.jpg": {
+      "filename": "34129.jpg",
+      "size_bytes": 2031551,
+      "modality": "image",
+      "flags": [],
+      "ela": {
+        "ela_ok": true,
+        "max_anomaly_score": 156.6666717529297,
+        "mean_difference": 3.513951301574707,
+        "p99_difference": 43.33333206176758,
+        "high_anomaly_ratio": 0.006180434992283951,
+        "image_width": 3840,
+        "image_height": 2160
+      },
+      "exif": {
+        "exif_ok": true,
+        "has_exif": true,
+        "DateTimeOriginal": "2026:09:26 22:56:00",
+        "CameraMake": "samsung",
+        "CameraModel": "SM-A276B",
+        "Software": "A276BXXU2AZH7",
+        "gps_latitude": null,
+        "gps_longitude": null,
+        "flags": [],
+        "date_taken": "2026:09:26 22:56:00",
+        "camera_make": "samsung",
+        "camera_model": "SM-A276B",
+        "software": "A276BXXU2AZH7"
+      },
+      "ela_anomalies": {
+        "ela_ok": true,
+        "max_anomaly_score": 156.6666717529297,
+        "mean_difference": 3.513951301574707,
+        "p99_difference": 43.33333206176758,
+        "high_anomaly_ratio": 0.006180434992283951,
+        "image_width": 3840,
+        "image_height": 2160
+      },
+      "exif_metadata": {
+        "exif_ok": true,
+        "has_exif": true,
+        "DateTimeOriginal": "2026:09:26 22:56:00",
+        "CameraMake": "samsung",
+        "CameraModel": "SM-A276B",
+        "Software": "A276BXXU2AZH7",
+        "gps_latitude": null,
+        "gps_longitude": null,
+        "flags": [],
+        "date_taken": "2026:09:26 22:56:00",
+        "camera_make": "samsung",
+        "camera_model": "SM-A276B",
+        "software": "A276BXXU2AZH7"
+      }
+    },
+    "edited.jpg": {
+      "filename": "edited.jpg",
+      "size_bytes": 1733415,
+      "modality": "image",
+      "flags": [
+        "missing_capture_date",
+        "missing_camera_info"
+      ],
+      "ela": {
+        "ela_ok": true,
+        "max_anomaly_score": 250.0,
+        "mean_difference": 2.723632335662842,
+        "p99_difference": 30.0,
+        "high_anomaly_ratio": 0.003301137198706643,
+        "image_width": 3024,
+        "image_height": 4032
+      },
+      "exif": {
+        "exif_ok": true,
+        "has_exif": true,
+        "DateTimeOriginal": null,
+        "CameraMake": null,
+        "CameraModel": null,
+        "Software": null,
+        "gps_latitude": null,
+        "gps_longitude": null,
+        "flags": [
+          "missing_capture_date",
+          "missing_camera_info"
+        ],
+        "date_taken": null,
+        "camera_make": null,
+        "camera_model": null,
+        "software": null
+      },
+      "ela_anomalies": {
+        "ela_ok": true,
+        "max_anomaly_score": 250.0,
+        "mean_difference": 2.723632335662842,
+        "p99_difference": 30.0,
+        "high_anomaly_ratio": 0.003301137198706643,
+        "image_width": 3024,
+        "image_height": 4032
+      },
+      "exif_metadata": {
+        "exif_ok": true,
+        "has_exif": true,
+        "DateTimeOriginal": null,
+        "CameraMake": null,
+        "CameraModel": null,
+        "Software": null,
+        "gps_latitude": null,
+        "gps_longitude": null,
+        "flags": [
+          "missing_capture_date",
+          "missing_camera_info"
+        ],
+        "date_taken": null,
+        "camera_make": null,
+        "camera_model": null,
+        "software": null
+      }
+    },
+    "voice recording.wav": {
+      "filename": "voice recording.wav",
+      "size_bytes": 790606,
+      "modality": "audio",
+      "flags": [],
+      "audio": {
+        "audio_ok": true,
+        "duration_sec": 8.23,
+        "sample_rate": 48000,
+        "spectral_centroid_mean": 2109.76,
+        "spectral_centroid_variance": 1149608.94,
+        "spectral_centroid_cv": 0.508,
+        "zero_crossing_rate_mean": 0.0283,
+        "quiet_frame_ratio": 0.004,
+        "digital_silence_ratio": 0.0052,
+        "energy_rolloff_hz": 3796.9,
+        "rolloff_vs_nyquist": 0.158,
+        "flags": [],
+        "unnatural_silence_dropoffs": false
+      },
+      "audio_spectrogram": {
+        "audio_ok": true,
+        "duration_sec": 8.23,
+        "sample_rate": 48000,
+        "spectral_centroid_mean": 2109.76,
+        "spectral_centroid_variance": 1149608.94,
+        "spectral_centroid_cv": 0.508,
+        "zero_crossing_rate_mean": 0.0283,
+        "quiet_frame_ratio": 0.004,
+        "digital_silence_ratio": 0.0052,
+        "energy_rolloff_hz": 3796.9,
+        "rolloff_vs_nyquist": 0.158,
+        "flags": [],
+        "unnatural_silence_dropoffs": false
+      }
+    },
+    "tts.wav": {
+      "filename": "tts.wav",
+      "size_bytes": 307482,
+      "modality": "audio",
+      "flags": [
+        "digital_silence_gaps"
+      ],
+      "audio": {
+        "audio_ok": true,
+        "duration_sec": 6.97,
+        "sample_rate": 22050,
+        "spectral_centroid_mean": 1491.67,
+        "spectral_centroid_variance": 1760675.9,
+        "spectral_centroid_cv": 0.89,
+        "zero_crossing_rate_mean": 0.1071,
+        "quiet_frame_ratio": 0.233,
+        "digital_silence_ratio": 0.2263,
+        "energy_rolloff_hz": 5577.1,
+        "rolloff_vs_nyquist": 0.506,
+        "flags": [
+          "digital_silence_gaps"
+        ],
+        "unnatural_silence_dropoffs": true
+      },
+      "audio_spectrogram": {
+        "audio_ok": true,
+        "duration_sec": 6.97,
+        "sample_rate": 22050,
+        "spectral_centroid_mean": 1491.67,
+        "spectral_centroid_variance": 1760675.9,
+        "spectral_centroid_cv": 0.89,
+        "zero_crossing_rate_mean": 0.1071,
+        "quiet_frame_ratio": 0.233,
+        "digital_silence_ratio": 0.2263,
+        "energy_rolloff_hz": 5577.1,
+        "rolloff_vs_nyquist": 0.506,
+        "flags": [
+          "digital_silence_gaps"
+        ],
+        "unnatural_silence_dropoffs": true
+      }
+    }
+  },
+  "all_flags": [
+    "edited.jpg: missing_capture_date",
+    "edited.jpg: missing_camera_info",
+    "tts.wav: digital_silence_gaps"
+  ]
+}
