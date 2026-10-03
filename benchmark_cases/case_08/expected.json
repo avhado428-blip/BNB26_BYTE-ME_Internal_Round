@@ -1,0 +1,19 @@
+{
+  "case_id": "case_08",
+  "expected_verdict": "CONTRADICTORY",
+  "has_contradiction": true,
+  "claim": "Audio confirms fireworks",
+  "conflicting_signal": "Visual scene is silent empty street",
+  "summary": "Audio-visual contradiction",
+  "mock_confidence": 0.79,
+  "mock_authenticity_score": 0.48,
+  "context": "Audio confirms fireworks",
+  "evidence": [
+    "synthetic_benchmark",
+    "case_08"
+  ],
+  "telemetry": {
+    "synthetic": true,
+    "case": "case_08"
+  }
+}

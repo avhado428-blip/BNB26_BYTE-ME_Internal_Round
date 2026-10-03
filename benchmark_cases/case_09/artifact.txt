@@ -1,0 +1,3 @@
+﻿TrustLayer synthetic artifact for case_09
+claim: Low-res screenshot
+expected: INCONCLUSIVE

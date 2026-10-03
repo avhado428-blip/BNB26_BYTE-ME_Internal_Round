@@ -1,0 +1,19 @@
+{
+  "case_id": "case_07",
+  "expected_verdict": "MANIPULATED",
+  "has_contradiction": true,
+  "claim": "Unedited press photo",
+  "conflicting_signal": "Clone-stamp residual map",
+  "summary": "Spliced region detected",
+  "mock_confidence": 0.86,
+  "mock_authenticity_score": 0.22,
+  "context": "Unedited press photo",
+  "evidence": [
+    "synthetic_benchmark",
+    "case_07"
+  ],
+  "telemetry": {
+    "synthetic": true,
+    "case": "case_07"
+  }
+}

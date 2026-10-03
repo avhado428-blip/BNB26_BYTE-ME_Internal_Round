@@ -1,0 +1,20 @@
+{
+  "case_id": "case_03",
+  "expected_verdict": "MANIPULATED",
+  "has_contradiction": true,
+  "claim": "Taken in Nairobi",
+  "conflicting_signal": "GPS maps to Berlin",
+  "demo_id": "demo_metadata_tamper",
+  "summary": "EXIF / GPS tamper",
+  "mock_confidence": 0.87,
+  "mock_authenticity_score": 0.28,
+  "context": "Taken in Nairobi",
+  "evidence": [
+    "synthetic_benchmark",
+    "case_03"
+  ],
+  "telemetry": {
+    "synthetic": true,
+    "case": "case_03"
+  }
+}

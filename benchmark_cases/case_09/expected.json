@@ -1,0 +1,18 @@
+{
+  "case_id": "case_09",
+  "expected_verdict": "INCONCLUSIVE",
+  "has_contradiction": false,
+  "claim": "Low-res screenshot",
+  "summary": "Insufficient forensic signal",
+  "mock_confidence": 0.35,
+  "mock_authenticity_score": 0.5,
+  "context": "Low-res screenshot",
+  "evidence": [
+    "synthetic_benchmark",
+    "case_09"
+  ],
+  "telemetry": {
+    "synthetic": true,
+    "case": "case_09"
+  }
+}

@@ -1,0 +1,27 @@
+# TrustLayer: Multi-Modal Authenticity Engine
+# Shared Dependencies across Workstreams 1, 2, 3, & 4
+
+# --- Workstream 2: Multimodal Reasoner & AI Core ---
+google-genai>=2.0.0
+pydantic>=2.9.0
+python-dotenv>=1.0.0
+
+# --- Workstream 1: Media Forensics & Signal Pipeline ---
+opencv-python>=4.8.0
+Pillow>=10.0.0
+librosa>=0.10.0
+numpy>=1.24.0
+exifread>=3.0.0
+soundfile>=0.12.0
+scipy>=1.11.0
+
+# --- Workstream 3: Backend API & Evaluation Suite ---
+fastapi>=0.115.0
+uvicorn[standard]>=0.32.0
+python-multipart>=0.0.12
+aiofiles>=24.1.0
+httpx>=0.27.0
+
+# --- Testing & Quality Assurance ---
+pytest>=8.0.0
+pytest-asyncio>=0.23.0

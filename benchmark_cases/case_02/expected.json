@@ -1,0 +1,20 @@
+{
+  "case_id": "case_02",
+  "expected_verdict": "MANIPULATED",
+  "has_contradiction": true,
+  "claim": "Interview subject is real",
+  "conflicting_signal": "Facial landmark flicker",
+  "demo_id": "demo_deepfake_video",
+  "summary": "Deepfake video clip",
+  "mock_confidence": 0.91,
+  "mock_authenticity_score": 0.12,
+  "context": "Interview subject is real",
+  "evidence": [
+    "synthetic_benchmark",
+    "case_02"
+  ],
+  "telemetry": {
+    "synthetic": true,
+    "case": "case_02"
+  }
+}

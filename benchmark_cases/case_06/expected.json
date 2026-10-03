@@ -1,0 +1,18 @@
+{
+  "case_id": "case_06",
+  "expected_verdict": "AUTHENTIC",
+  "has_contradiction": false,
+  "claim": "Raw drone still authentic",
+  "summary": "Synthetic authentic drone still",
+  "mock_confidence": 0.88,
+  "mock_authenticity_score": 0.91,
+  "context": "Raw drone still authentic",
+  "evidence": [
+    "synthetic_benchmark",
+    "case_06"
+  ],
+  "telemetry": {
+    "synthetic": true,
+    "case": "case_06"
+  }
+}

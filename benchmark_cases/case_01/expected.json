@@ -1,0 +1,19 @@
+{
+  "case_id": "case_01",
+  "expected_verdict": "AUTHENTIC",
+  "has_contradiction": false,
+  "claim": "Street photo is genuine",
+  "demo_id": "demo_authentic_photo",
+  "summary": "Clean authentic still image",
+  "mock_confidence": 0.94,
+  "mock_authenticity_score": 0.96,
+  "context": "Street photo is genuine",
+  "evidence": [
+    "synthetic_benchmark",
+    "case_01"
+  ],
+  "telemetry": {
+    "synthetic": true,
+    "case": "case_01"
+  }
+}
