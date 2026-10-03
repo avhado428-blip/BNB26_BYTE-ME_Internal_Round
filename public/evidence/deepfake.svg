@@ -1,0 +1,28 @@
+<svg width="640" height="360" viewBox="0 0 640 360" xmlns="http://www.w3.org/2000/svg">
+  <rect width="640" height="360" fill="#1a1018"/>
+  <rect x="40" y="35" width="560" height="290" rx="8" fill="#241521"/>
+
+  <text x="320" y="70" text-anchor="middle" fill="#f87171" font-family="Arial" font-size="16" font-weight="bold">
+    SYNTHETIC IMAGE SAMPLE
+  </text>
+
+  <ellipse cx="320" cy="180" rx="82" ry="100" fill="#4b2635"/>
+
+  <ellipse cx="288" cy="165" rx="15" ry="10" fill="#fca5a5"/>
+  <ellipse cx="352" cy="165" rx="15" ry="10" fill="#fca5a5"/>
+
+  <circle cx="288" cy="165" r="5" fill="#450a0a"/>
+  <circle cx="352" cy="165" r="5" fill="#450a0a"/>
+
+  <path d="M285 220 Q320 245 355 220" fill="none" stroke="#fb7185" stroke-width="6"/>
+
+  <path d="M235 120 L270 100 L300 125" fill="none" stroke="#ef4444" stroke-width="4"/>
+  <path d="M340 125 L370 100 L405 120" fill="none" stroke="#ef4444" stroke-width="4"/>
+
+  <rect x="90" y="275" width="460" height="24" rx="4" fill="#3f1724"/>
+  <rect x="90" y="275" width="360" height="24" rx="4" fill="#dc2626"/>
+
+  <text x="320" y="292" text-anchor="middle" fill="#fee2e2" font-family="Arial" font-size="11" font-weight="bold">
+    HIGH SYNTHETIC SIGNAL
+  </text>
+</svg>

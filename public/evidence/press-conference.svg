@@ -1,0 +1,22 @@
+<svg width="640" height="360" viewBox="0 0 640 360" xmlns="http://www.w3.org/2000/svg">
+  <rect width="640" height="360" fill="#172033"/>
+  <rect x="40" y="35" width="560" height="290" rx="8" fill="#1e293b"/>
+  <rect x="70" y="65" width="500" height="40" rx="4" fill="#0f172a"/>
+  <text x="320" y="91" text-anchor="middle" fill="#94a3b8" font-family="Arial" font-size="18" font-weight="bold">
+    PRESS CONFERENCE
+  </text>
+
+  <rect x="105" y="135" width="120" height="145" rx="6" fill="#334155"/>
+  <circle cx="165" cy="170" r="32" fill="#64748b"/>
+  <rect x="130" y="208" width="70" height="55" rx="20" fill="#475569"/>
+
+  <rect x="255" y="155" width="280" height="95" rx="6" fill="#0f172a"/>
+  <rect x="280" y="175" width="110" height="12" rx="3" fill="#475569"/>
+  <rect x="280" y="200" width="210" height="9" rx="3" fill="#334155"/>
+  <rect x="280" y="220" width="170" height="9" rx="3" fill="#334155"/>
+
+  <circle cx="555" cy="300" r="9" fill="#10b981"/>
+  <text x="535" y="320" text-anchor="end" fill="#64748b" font-family="Arial" font-size="11">
+    VERIFIED SOURCE
+  </text>
+</svg>
