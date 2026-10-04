@@ -1,6 +1,13 @@
 "use client";
 
 import { Handle, Position, type NodeProps } from "@xyflow/react";
+import {
+  FileText,
+  Image as ImageIcon,
+  MessageSquare,
+  Music,
+  Video as VideoIcon,
+} from "lucide-react";
 import type { MediaArtifact } from "@/lib/types";
 
 type MediaArtifactNodeData = {
@@ -11,83 +18,107 @@ type MediaArtifactNodeProps = NodeProps & {
   data: MediaArtifactNodeData;
 };
 
-const modalityIcons: Record<
-  MediaArtifact["modality"],
-  string
-> = {
-  image: "IMG",
-  video: "VID",
-  audio: "AUD",
-  document: "DOC",
-  message: "MSG",
-};
-
 export default function MediaArtifactNode({
   data,
+  selected,
 }: MediaArtifactNodeProps) {
   const artifact = data.artifact;
 
-  const icon = modalityIcons[artifact.modality];
+  const getModalityIcon = (modality: string) => {
+    switch (modality) {
+      case "image":
+        return <ImageIcon className="size-4 text-cyan-400" />;
+      case "audio":
+        return <Music className="size-4 text-purple-400" />;
+      case "video":
+        return <VideoIcon className="size-4 text-indigo-400" />;
+      case "document":
+        return <FileText className="size-4 text-amber-400" />;
+      default:
+        return <MessageSquare className="size-4 text-slate-400" />;
+    }
+  };
+
+  const provenance = artifact.forensic?.provenance ?? 85;
+  const synthetic = artifact.forensic?.syntheticProbability ?? 15;
 
   return (
-    <div className="min-w-[220px] rounded-lg border border-slate-700 bg-[#111827] px-4 py-4 shadow-xl">
-      <Handle
-        type="source"
-        position={Position.Right}
-        className="!h-2 !w-2 !border-0 !bg-cyan-400"
-      />
-
+    <div
+      className={`group relative min-w-[240px] rounded-xl border bg-slate-900/90 p-3.5 shadow-2xl backdrop-blur-md transition-all duration-200 ${
+        selected
+          ? "border-cyan-400/80 ring-2 ring-cyan-400/20 shadow-cyan-500/10"
+          : "border-slate-800 hover:border-slate-700 hover:shadow-cyan-500/5"
+      }`}
+    >
+      {/* Handles */}
       <Handle
         type="target"
         position={Position.Left}
-        className="!h-2 !w-2 !border-0 !bg-slate-500"
+        className="!size-2.5 !border-2 !border-slate-900 !bg-slate-400 transition-colors group-hover:!bg-cyan-400"
+      />
+      <Handle
+        type="source"
+        position={Position.Right}
+        className="!size-2.5 !border-2 !border-slate-900 !bg-cyan-400 shadow-sm shadow-cyan-400/50"
       />
 
-      <div className="flex items-start gap-3">
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded border border-cyan-500/20 bg-cyan-500/5 text-[9px] font-bold text-cyan-400">
-          {icon}
+      {/* Header */}
+      <div className="flex items-start gap-2.5">
+        <div className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-white/5 bg-white/5 shadow-inner">
+          {getModalityIcon(artifact.modality)}
         </div>
 
         <div className="min-w-0 flex-1">
           <p className="truncate text-xs font-semibold text-slate-200">
             {artifact.filename}
           </p>
-
-          <p className="mt-1 text-[9px] font-semibold uppercase tracking-widest text-slate-600">
-            {artifact.modality}
-          </p>
+          <div className="mt-0.5 flex items-center gap-1.5">
+            <span className="inline-flex items-center rounded-sm bg-white/5 px-1.5 py-0.5 text-[9px] font-medium uppercase tracking-wider text-slate-400">
+              {artifact.modality}
+            </span>
+            {artifact.forensicDetails?.format && (
+              <span className="text-[9px] text-slate-500">
+                • {artifact.forensicDetails.format}
+              </span>
+            )}
+          </div>
         </div>
       </div>
 
-      {artifact.description && (
-        <p className="mt-3 text-[10px] leading-4 text-slate-500">
-          {artifact.description}
-        </p>
-      )}
-
-      {artifact.forensic && (
-        <div className="mt-4 grid grid-cols-2 gap-2">
-          <div className="rounded border border-slate-700 bg-[#0b1120] px-2 py-2">
-            <p className="text-[8px] font-semibold tracking-wider text-slate-600">
-              PROVENANCE
-            </p>
-
-            <p className="mt-1 text-xs font-semibold text-slate-300">
-              {artifact.forensic.provenance}%
-            </p>
-          </div>
-
-          <div className="rounded border border-slate-700 bg-[#0b1120] px-2 py-2">
-            <p className="text-[8px] font-semibold tracking-wider text-slate-600">
-              SYNTHETIC
-            </p>
-
-            <p className="mt-1 text-xs font-semibold text-slate-300">
-              {artifact.forensic.syntheticProbability}%
-            </p>
-          </div>
+      {/* Forensic Signal Bars */}
+      <div className="mt-3 space-y-1.5 border-t border-white/5 pt-2.5">
+        <div className="flex items-center justify-between text-[10px]">
+          <span className="text-slate-400">Signal Provenance</span>
+          <span className="font-mono font-medium text-emerald-400">
+            {provenance}%
+          </span>
         </div>
-      )}
+        <div className="h-1 w-full overflow-hidden rounded-full bg-slate-800">
+          <div
+            className="h-full rounded-full bg-emerald-500"
+            style={{ width: `${Math.min(100, Math.max(0, provenance))}%` }}
+          />
+        </div>
+
+        <div className="flex items-center justify-between text-[10px]">
+          <span className="text-slate-400">Synthetic Anomaly</span>
+          <span
+            className={`font-mono font-medium ${
+              synthetic > 50 ? "text-rose-400" : "text-slate-400"
+            }`}
+          >
+            {synthetic}%
+          </span>
+        </div>
+        <div className="h-1 w-full overflow-hidden rounded-full bg-slate-800">
+          <div
+            className={`h-full rounded-full ${
+              synthetic > 50 ? "bg-rose-500" : "bg-slate-500"
+            }`}
+            style={{ width: `${Math.min(100, Math.max(0, synthetic))}%` }}
+          />
+        </div>
+      </div>
     </div>
   );
 }
