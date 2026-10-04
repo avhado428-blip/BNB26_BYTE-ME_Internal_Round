@@ -67,7 +67,7 @@ class ExtractedClaim(BaseModel):
     Individual verifiable claim extracted from an artifact within the bundle.
     Anchored spatially (e.g. 'upper-right corner') or temporally (e.g. '00:14 timestamp').
     """
-    model_config = ConfigDict(populate_by_name=True, extra="ignore")
+    model_config = ConfigDict(populate_by_name=True, extra="allow")
 
     source_artifact: str = Field(
         ...,
@@ -119,7 +119,7 @@ class ContradictionLink(BaseModel):
     Pairwise contradiction detected between two distinct artifacts in the evidence bundle.
     Forms the edges of the React Flow Cross-Modal Conflict Graph.
     """
-    model_config = ConfigDict(populate_by_name=True, extra="ignore")
+    model_config = ConfigDict(populate_by_name=True, extra="allow")
 
     artifact_source_a: str = Field(
         ...,
@@ -203,7 +203,7 @@ class InvestigationVerdict(BaseModel):
     Final synthesized forensic verdict from the Multimodal Reasoning Engine.
     Guarantees strict JSON output compliance with calibrated epistemic uncertainty.
     """
-    model_config = ConfigDict(populate_by_name=True, extra="ignore")
+    model_config = ConfigDict(populate_by_name=True, extra="allow")
 
     case_id: str = Field(
         default_factory=lambda: f"CASE-{uuid.uuid4().hex[:8].upper()}",
@@ -529,14 +529,8 @@ Output must strictly conform to the provided JSON schema.
 
 
 # ============================================================================
-def _sanitize_gemini_schema(schema: Any) -> Any:
-    """Removes 'additionalProperties' which is rejected by Gemini Developer API."""
-    if isinstance(schema, dict):
-        return {k: _sanitize_gemini_schema(v) for k, v in schema.items() if k != "additionalProperties"}
-    elif isinstance(schema, list):
-        return [_sanitize_gemini_schema(i) for i in schema]
-    return schema
-
+# TrustLayer Reasoner Core Engine
+# ============================================================================
 
 class TrustLayerReasoner:
     """
@@ -549,8 +543,8 @@ class TrustLayerReasoner:
     def __init__(
         self,
         api_key: Optional[str] = None,
-        model: str = "gemini-3.1-flash-lite",
-        fallback_model: str = "gemini-3.5-flash-lite",
+        model: str = "gemini-2.5-flash",
+        fallback_model: str = "gemini-1.5-pro",
         temperature: float = 0.1,
         mock_mode: bool = False,
     ):
@@ -724,12 +718,11 @@ class TrustLayerReasoner:
                 "weigh signal telemetry, calibrate epistemic uncertainty, and produce an explainable evidence chain.\n"
             )))
 
-            raw_schema = InvestigationVerdict.model_json_schema()
-            gemini_schema = _sanitize_gemini_schema(raw_schema)
+            # 4. Generate Content with Structured Output
             config = types.GenerateContentConfig(
                 system_instruction=SYSTEM_PROMPT,
                 response_mime_type="application/json",
-                response_schema=gemini_schema,
+                response_schema=InvestigationVerdict,
                 temperature=self.temperature,
             )
 
