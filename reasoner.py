@@ -23,10 +23,10 @@ import os
 import tempfile
 import uuid
 from pathlib import Path
-from typing import Any, Dict, List, Literal, Optional, Union
+from typing import Any, Dict, List, Literal, Optional, Self, Union
 
 from dotenv import load_dotenv
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, computed_field, model_validator
 
 # Load environment variables (.env) if available
 load_dotenv()
@@ -146,14 +146,38 @@ class ContradictionLink(BaseModel):
     @classmethod
     def remap_alternate_fields(cls, data: Any) -> Any:
         """Allow backwards/cross compatibility with alternate parameter names."""
+        if hasattr(data, "model_dump"):
+            data = data.model_dump()
+        elif hasattr(data, "dict") and callable(data.dict):
+            data = data.dict()
         if isinstance(data, dict):
             d = dict(data)
+            if "sources" in d:
+                srcs = d["sources"]
+                if isinstance(srcs, list):
+                    if len(srcs) >= 2:
+                        d.setdefault("artifact_source_a", str(srcs[0]))
+                        d.setdefault("artifact_source_b", str(srcs[1]))
+                    elif len(srcs) == 1:
+                        d.setdefault("artifact_source_a", str(srcs[0]))
+                        d.setdefault("artifact_source_b", "secondary_modality")
             if "artifact_a" in d and "artifact_source_a" not in d:
                 d["artifact_source_a"] = d["artifact_a"]
             if "artifact_b" in d and "artifact_source_b" not in d:
                 d["artifact_source_b"] = d["artifact_b"]
-            if "description" in d and "evidence_reasoning" not in d:
+            d.setdefault("artifact_source_a", "artifact_source_a")
+            d.setdefault("artifact_source_b", "artifact_source_b")
+
+            if "severity" in d and isinstance(d["severity"], (int, float)):
+                sev_num = float(d["severity"])
+                d["severity"] = "critical" if sev_num >= 0.7 else ("medium" if sev_num >= 0.4 else "low")
+
+            if "conflicting_signal" in d and "evidence_reasoning" not in d:
+                claim_str = f"Claim: {d.get('claim')} | " if d.get("claim") else ""
+                d["evidence_reasoning"] = f"{claim_str}Conflict: {d['conflicting_signal']}"
+            elif "description" in d and "evidence_reasoning" not in d:
                 d["evidence_reasoning"] = d["description"]
+            d.setdefault("evidence_reasoning", "Cross-modal forensic discrepancy detected.")
             return d
         return data
 
@@ -243,21 +267,64 @@ class InvestigationVerdict(BaseModel):
         default=None,
         description="1.0 = fully authentic, 0.0 = completely synthetic / manipulated"
     )
+    graph: Dict[str, Any] = Field(
+        default_factory=dict,
+        description="React Flow graph nodes and edges for frontend UI visualization"
+    )
 
     @model_validator(mode="before")
     @classmethod
     def remap_alternate_fields(cls, data: Any) -> Any:
         """Allow backwards/cross compatibility with alternate parameter names."""
+        if hasattr(data, "model_dump"):
+            data = data.model_dump()
+        elif hasattr(data, "dict") and callable(data.dict):
+            data = data.dict()
         if isinstance(data, dict):
             d = dict(data)
             if "verdict" in d and "overall_verdict" not in d:
-                d["overall_verdict"] = str(d["verdict"]).lower()
+                raw_v = d["verdict"]
+                if hasattr(raw_v, "value"):
+                    v_str = str(raw_v.value).lower()
+                else:
+                    v_str = str(raw_v).split(".")[-1].lower()
+                if v_str in ("authentic", "manipulated"):
+                    d["overall_verdict"] = v_str
+                elif v_str in ("contradictory", "coordinated_synthetic", "synthetic"):
+                    d["overall_verdict"] = "coordinated_synthetic"
+                else:
+                    d["overall_verdict"] = "insufficient_evidence"
+            elif "overall_verdict" in d:
+                raw_ov = d["overall_verdict"]
+                if hasattr(raw_ov, "value"):
+                    d["overall_verdict"] = str(raw_ov.value).lower()
+                elif isinstance(raw_ov, str) and "." in raw_ov:
+                    d["overall_verdict"] = raw_ov.split(".")[-1].lower()
+
             if "confidence" in d and "confidence_score" not in d:
-                d["confidence_score"] = d["confidence"]
+                d["confidence_score"] = float(d["confidence"])
+            if "confidence_score" in d and "confidence" not in d:
+                d["confidence"] = d["confidence_score"]
+
             if "summary" in d and "uncertainty_justification" not in d:
-                d["uncertainty_justification"] = d["summary"]
+                d["uncertainty_justification"] = str(d["summary"])
             if "uncertainty_reasoning" in d and "uncertainty_justification" not in d:
-                d["uncertainty_justification"] = d["uncertainty_reasoning"]
+                d["uncertainty_justification"] = str(d["uncertainty_reasoning"])
+            if "uncertainty_justification" not in d:
+                d["uncertainty_justification"] = "Synthesized forensic verdict across evidence modalities."
+
+            if "uncertainty_level" not in d:
+                conf = d.get("confidence_score", d.get("confidence", 0.5))
+                if isinstance(conf, (int, float)):
+                    if conf >= 0.8:
+                        d["uncertainty_level"] = "low"
+                    elif conf <= 0.5:
+                        d["uncertainty_level"] = "high"
+                    else:
+                        d["uncertainty_level"] = "medium"
+                else:
+                    d["uncertainty_level"] = "medium"
+
             if "claims" in d and "claims_extracted" not in d:
                 d["claims_extracted"] = d["claims"]
             if "inconsistencies" in d and "contradictions_detected" not in d:
@@ -271,38 +338,56 @@ class InvestigationVerdict(BaseModel):
             return d
         return data
 
+    @model_validator(mode="after")
+    def populate_graph_if_empty(self) -> Self:
+        if not self.graph:
+            try:
+                self.graph = self.to_graph_dict()
+            except Exception:
+                pass
+        return self
+
+    @computed_field  # type: ignore[prop-decorator]
     @property
     def verdict(self) -> str:
         return self.overall_verdict
 
+    @computed_field  # type: ignore[prop-decorator]
     @property
     def confidence(self) -> float:
         return self.confidence_score
 
+    @computed_field  # type: ignore[prop-decorator]
     @property
     def summary(self) -> str:
         return self.uncertainty_justification
 
+    @computed_field  # type: ignore[prop-decorator]
     @property
     def uncertainty_reasoning(self) -> str:
         return self.uncertainty_justification
 
+    @computed_field  # type: ignore[prop-decorator]
     @property
     def claims(self) -> List[ExtractedClaim]:
         return self.claims_extracted
 
+    @computed_field  # type: ignore[prop-decorator]
     @property
     def contradictions(self) -> List[ContradictionLink]:
         return self.contradictions_detected
 
+    @computed_field  # type: ignore[prop-decorator]
     @property
     def inconsistencies(self) -> List[ContradictionLink]:
         return self.contradictions_detected
 
+    @computed_field  # type: ignore[prop-decorator]
     @property
     def evidence(self) -> List[str]:
         return self.explainable_evidence_chain
 
+    @computed_field  # type: ignore[prop-decorator]
     @property
     def telemetry(self) -> Dict[str, Any]:
         return self.forensic_telemetry

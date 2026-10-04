@@ -252,12 +252,19 @@ def _coerce_verdict(raw: Any, *, case_id: str, names: list[str], elapsed: float)
         if not raw.artifact_names:
             raw.artifact_names = names
         return raw
-    if isinstance(raw, dict):
-        raw.setdefault("case_id", case_id)
-        raw.setdefault("artifact_names", names)
-        raw["processing_time_seconds"] = elapsed
-        return InvestigationVerdict.model_validate(raw)
-    raise TypeError(f"Unsupported verdict type: {type(raw)!r}")
+    if hasattr(raw, "model_dump"):
+        data = raw.model_dump()
+    elif isinstance(raw, dict):
+        data = dict(raw)
+    elif hasattr(raw, "dict") and callable(raw.dict):
+        data = raw.dict()
+    else:
+        raise TypeError(f"Unsupported verdict type: {type(raw)!r}")
+
+    data.setdefault("case_id", case_id)
+    data.setdefault("artifact_names", names)
+    data["processing_time_seconds"] = elapsed
+    return InvestigationVerdict.model_validate(data)
 
 
 # Routes----------------------------------------------------------
@@ -306,10 +313,15 @@ async def investigate(
         loaded = await asyncio.gather(*[_read_upload(u) for u in artifacts])
     except Exception as exc:  # noqa: BLE001
         logger.exception("Failed reading uploads")
-        return fallback_verdict(
+        return _coerce_verdict(
+            fallback_verdict(
+                case_id=case_id,
+                artifact_names=[],
+                error_note=f"upload_read_error: {exc}",
+            ),
             case_id=case_id,
-            artifact_names=[],
-            error_note=f"upload_read_error: {exc}",
+            names=[],
+            elapsed=round(time.perf_counter() - started, 4),
         )
 
     names = [a["filename"] for a in loaded]
@@ -327,7 +339,12 @@ async def investigate(
         demo.processing_time_seconds = round(time.perf_counter() - started, 4)
         demo.mock = True
         logger.info("Serving mock verdict for case_id=%s demo=%s", case_id, demo.verdict)
-        return demo
+        return _coerce_verdict(
+            demo,
+            case_id=case_id,
+            names=names or demo.artifact_names,
+            elapsed=round(time.perf_counter() - started, 4),
+        )
 
     # Soft mock if packages/keys clearly unavailable
     if _extract_fn is None and _reason_fn is None:
@@ -339,7 +356,12 @@ async def investigate(
             demo.mock = True
             demo.error_note = "T1/T2 unavailable — demo mock matched from context/filename"
             logger.warning("Auto-mock demo path: %s", demo.error_note)
-            return demo
+            return _coerce_verdict(
+                demo,
+                case_id=case_id,
+                names=names or demo.artifact_names,
+                elapsed=round(time.perf_counter() - started, 4),
+            )
 
     # --- Live pipeline: parallel forensic extraction on media --------------
     media = [a for a in loaded if _is_media(a["filename"], a["content_type"])]
@@ -395,11 +417,16 @@ async def investigate(
 
     except asyncio.TimeoutError:
         logger.error("Pipeline timeout after %ss", PIPELINE_TIMEOUT_SECONDS)
-        return fallback_verdict(
+        return _coerce_verdict(
+            fallback_verdict(
+                case_id=case_id,
+                artifact_names=names,
+                error_note=f"timeout_after_{PIPELINE_TIMEOUT_SECONDS}s",
+                processing_time_seconds=round(time.perf_counter() - started, 4),
+            ),
             case_id=case_id,
-            artifact_names=names,
-            error_note=f"timeout_after_{PIPELINE_TIMEOUT_SECONDS}s",
-            processing_time_seconds=round(time.perf_counter() - started, 4),
+            names=names,
+            elapsed=round(time.perf_counter() - started, 4),
         )
     except Exception as exc:  # noqa: BLE001
         logger.exception("Investigate pipeline failed")
@@ -412,12 +439,22 @@ async def investigate(
             demo.mock = True
             demo.fallback = True
             demo.error_note = f"pipeline_error_using_demo: {exc}"
-            return demo
-        return fallback_verdict(
+            return _coerce_verdict(
+                demo,
+                case_id=case_id,
+                names=names,
+                elapsed=round(time.perf_counter() - started, 4),
+            )
+        return _coerce_verdict(
+            fallback_verdict(
+                case_id=case_id,
+                artifact_names=names,
+                error_note=str(exc),
+                processing_time_seconds=round(time.perf_counter() - started, 4),
+            ),
             case_id=case_id,
-            artifact_names=names,
-            error_note=str(exc),
-            processing_time_seconds=round(time.perf_counter() - started, 4),
+            names=names,
+            elapsed=round(time.perf_counter() - started, 4),
         )
 
 

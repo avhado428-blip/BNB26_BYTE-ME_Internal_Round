@@ -732,7 +732,7 @@ function ForensicDetails({
     <DetailRow
       label="ASPECT RATIO"
       value={
-        details.aspectRatio !== undefined
+        details.aspectRatio != null
           ? details.aspectRatio.toFixed(3)
           : undefined
       }
@@ -746,7 +746,7 @@ function ForensicDetails({
     <DetailRow
       label="ENTROPY"
       value={
-        details.entropy !== undefined
+        details.entropy != null
           ? details.entropy.toFixed(3)
           : undefined
       }
@@ -924,10 +924,10 @@ function ScoreRow({
   inverted = false,
 }: {
   label: string;
-  value?: number;
+  value?: number | null;
   inverted?: boolean;
 }) {
-  if (value === undefined) {
+  if (value == null) {
     return (
       <div className="flex items-center justify-between border-b border-slate-800 px-3 py-2.5 last:border-b-0">
         <span className="text-[9px] font-semibold tracking-wider text-slate-600">
